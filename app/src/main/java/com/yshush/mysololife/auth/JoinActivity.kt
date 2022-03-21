@@ -77,7 +77,6 @@ class JoinActivity : AppCompatActivity() {
                     }
                 }
             }
-
         }
     }
 }
