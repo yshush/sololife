@@ -16,6 +16,7 @@ buildscript {
 ext {
     navVersion = '2.3.5'
     kotlinVersion = '1.5.0'
+    glideVersion = '4.13.0'
 }
 
 task clean(type: Delete) {
