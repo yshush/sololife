@@ -30,10 +30,21 @@ class TipFragment : Fragment() {
         binding = DataBindingUtil.inflate(inflater, R.layout.fragment_tip, container, false)
 
         binding.categoryAll.setOnClickListener {
-
             val intent = Intent(context, ContentListActivity::class.java)
+            intent.putExtra("category", "category1")
             startActivity(intent)
+        }
 
+        binding.categoryCook.setOnClickListener {
+            val intent = Intent(context, ContentListActivity::class.java)
+            intent.putExtra("category", "category2")
+            startActivity(intent)
+        }
+
+        binding.categoryEconomy.setOnClickListener {
+            val intent = Intent(context, ContentListActivity::class.java)
+            intent.putExtra("category", "category3")
+            startActivity(intent)
         }
 
         binding.homeTap.setOnClickListener {
