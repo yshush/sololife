@@ -1,5 +1,6 @@
 package com.yshush.mysololife.board
 
+import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
@@ -24,7 +25,9 @@ class BoardInsideActivity : AppCompatActivity() {
 
     private val TAG = BoardInsideActivity::class.java.simpleName
 
-    private lateinit var binding : ActivityBoardInsideBinding
+    private lateinit var binding: ActivityBoardInsideBinding
+
+    private lateinit var key: String
 
     override fun onCreate(savedInstanceState: Bundle?) {
 
@@ -46,12 +49,12 @@ class BoardInsideActivity : AppCompatActivity() {
 //        binding.timeArea.text = time
 
         // 두번째 방법
-        val key = intent.getStringExtra("key")
-        getBoardData(key.toString())
-        getImageData(key.toString())
+        key = intent.getStringExtra("key").toString()
+        getBoardData(key)
+        getImageData(key)
     }
 
-    private fun showDialog(){
+    private fun showDialog() {
         val mDialogView = LayoutInflater.from(this).inflate(R.layout.custom_dialog, null)
         val mBuilder = AlertDialog.Builder(this)
             .setView(mDialogView)
@@ -59,16 +62,24 @@ class BoardInsideActivity : AppCompatActivity() {
 
         val alertDialog = mBuilder.show()
 
+        // 수정버튼
         alertDialog.findViewById<Button>(R.id.editBtn)?.setOnClickListener {
-            Toast.makeText(this, "aa", Toast.LENGTH_LONG).show()
+            Toast.makeText(this, "수정 버튼을 눌렀습니다", Toast.LENGTH_LONG).show()
+
+            val intent = Intent(this, BoardEditActivity::class.java)
+            intent.putExtra("key", key)
+            startActivity(intent)
         }
 
+        // 삭제버튼
         alertDialog.findViewById<Button>(R.id.removeBtn)?.setOnClickListener {
-            Toast.makeText(this, "bb", Toast.LENGTH_LONG).show()
+            FBRef.boardRef.child(key).removeValue()
+            Toast.makeText(this, "삭제완료", Toast.LENGTH_LONG).show()
+            finish()
         }
     }
 
-    private fun getImageData(key : String) {
+    private fun getImageData(key: String) {
 
         // Reference to an image file in Cloud Storage
         val storageReference = Firebase.storage.reference.child(key + ".png")
@@ -77,7 +88,7 @@ class BoardInsideActivity : AppCompatActivity() {
         val imageViewFromFB = binding.getImageArea
 
         storageReference.downloadUrl.addOnCompleteListener(OnCompleteListener { task ->
-            if(task.isSuccessful) {
+            if (task.isSuccessful) {
                 Glide.with(this)
                     .load(task.result)
                     .into(imageViewFromFB)
@@ -85,18 +96,23 @@ class BoardInsideActivity : AppCompatActivity() {
         })
     }
 
-    private fun getBoardData(key : String){
+    private fun getBoardData(key: String) {
 
         val postListener = object : ValueEventListener {
             override fun onDataChange(dataSnapshot: DataSnapshot) {
 
-                val dataModel = dataSnapshot.getValue(BoardModel::class.java)
-                Log.d(TAG, dataModel!!.title)
+                try {
+                    val dataModel = dataSnapshot.getValue(BoardModel::class.java)
+                    Log.d(TAG, dataModel!!.title)
 
-                binding.titleArea.text = dataModel!!.title
-                binding.contentArea.text = dataModel!!.content
-                binding.timeArea.text = dataModel!!.time
+                    binding.titleArea.text = dataModel!!.title
+                    binding.contentArea.text = dataModel!!.content
+                    binding.timeArea.text = dataModel!!.time
+                } catch (e: Exception) {
 
+                    Log.d(TAG, "삭제완료")
+
+                }
             }
 
             override fun onCancelled(databaseError: DatabaseError) {
