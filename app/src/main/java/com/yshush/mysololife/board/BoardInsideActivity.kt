@@ -9,6 +9,8 @@ import android.widget.Button
 import android.widget.ImageView
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
+import androidx.core.view.isInvisible
+import androidx.core.view.isVisible
 import androidx.databinding.DataBindingUtil
 import com.bumptech.glide.Glide
 import com.google.android.gms.tasks.OnCompleteListener
@@ -19,6 +21,7 @@ import com.google.firebase.ktx.Firebase
 import com.google.firebase.storage.ktx.storage
 import com.yshush.mysololife.R
 import com.yshush.mysololife.databinding.ActivityBoardInsideBinding
+import com.yshush.mysololife.utils.FBAuth
 import com.yshush.mysololife.utils.FBRef
 
 class BoardInsideActivity : AppCompatActivity() {
@@ -108,6 +111,17 @@ class BoardInsideActivity : AppCompatActivity() {
                     binding.titleArea.text = dataModel!!.title
                     binding.contentArea.text = dataModel!!.content
                     binding.timeArea.text = dataModel!!.time
+
+                    val myUid = FBAuth.getUid()
+                    val writerUid = dataModel.uid
+
+                    if(myUid.equals(writerUid)) {
+                        Log.d(TAG, "내가 쓴 글")
+                        binding.boardSettingIcon.isVisible = true
+                    } else {
+                        Log.d(TAG, "내가 쓴 글 아님")
+                    }
+
                 } catch (e: Exception) {
 
                     Log.d(TAG, "삭제완료")
